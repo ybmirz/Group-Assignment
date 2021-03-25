@@ -22,7 +22,7 @@ function varargout = assignment(varargin)
 
 % Edit the above text to modify the response to help assignment
 
-% Last Modified by GUIDE v2.5 20-Mar-2021 15:05:12
+% Last Modified by GUIDE v2.5 25-Mar-2021 17:09:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -150,9 +150,9 @@ table = ["Beginning Balance", "Payment", "Interest", "Principal", "Ending Balanc
 set(hObject,'ColumnName',table);
 
 
-% --- Executes on button press in calculate.
-function calculate_Callback(hObject, eventdata, handles)
-% hObject    handle to calculate (see GCBO)
+% --- Executes on button press in calculateButton.
+function calculateButton_Callback(hObject, eventdata, handles)
+% hObject    handle to calculateButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -173,12 +173,15 @@ if loan > 5000
             set(handles.dataDisplay, 'Data', data);
         else
             errordlg("Monthly payment too small", "warning");
+            set(handles.dataDisplay, 'Data', []);
         end     
     else
-        errordlg("Insufficient interest rate, minimum 1.5%", "warning"); 
+        errordlg("Insufficient interest rate, minimum 1.5%", "warning");
+        set(handles.dataDisplay, 'Data', []);
     end
 else
     errordlg("Insufficient loan amount, minimum $5000", "warning");
+    set(handles.dataDisplay, 'Data', []);
 end
 
     function data = calculateData(loan, monthlyPayment, interest)
@@ -202,8 +205,16 @@ end
             iteration = iteration + 1;
         end
 
-
-
+        
+% --- Executes on button press in clearButton.
+function clearButton_Callback(hObject, eventdata, handles)
+% hObject    handle to clearButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+selection = questdlg('Do you want to clear the result?', 'Clear', 'Yes', 'No', 'Yes');
+if strcmp(selection, 'Yes') == 1
+    set(handles.dataDisplay, 'Data', []);
+end
 
 % --------------------------------------------------------------------
 function FileMenu_Callback(hObject, eventdata, handles)
@@ -218,16 +229,108 @@ function PrintMenuItem_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 printdlg(handles.figure1)
 
+
+% --------------------------------------------------------------------
+function SaveImage_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+selection = questdlg('Save this result as jpg?', 'Save', 'Yes', 'No', 'Yes');
+
+if strcmp(selection,'Yes')
+    saveas(handles.figure1, 'saved_image', 'jpg');
+end
+
+
+% --------------------------------------------------------------------
+function Help_Callback(hObject, eventdata, handles)
+% hObject    handle to Help (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+msgbox({'This is an app made in MATLAB for calculating interest.'; 'If you encounter any bug, please contact: hfymh2@nottingham.edu.my'}, 'Help', 'help');
+
 % --------------------------------------------------------------------
 function CloseMenuItem_Callback(hObject, eventdata, handles)
 % hObject    handle to CloseMenuItem (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-selection = questdlg(['Close ' get(handles.figure1,'Name') '?'],...
+selection = questdlg('Close without saving?',...
                      ['Close ' get(handles.figure1,'Name') '...'],...
-                     'Yes','No','Yes');
-if strcmp(selection,'No')
+                     'Yes','Save','Cancel', 'Yes');
+if strcmp(selection,'Yes')
+    delete(handles.figure1);
+elseif strcmp(selection,'Save')
+    saveas(handles.figure1, 'saved_image', 'jpg');
+    delete(handles.figure1);
+else
     return;
 end
 
-delete(handles.figure1)
+
+% --------------------------------------------------------------------
+function CopyPasteMenuLoan_Callback(hObject, eventdata, handles)
+% hObject    handle to CopyPasteMenuLoan (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function PasteTextLoan_Callback(hObject, eventdata, handles)
+% hObject    handle to PasteTextPayment (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+contents = clipboard('paste');
+set(handles.editLoan, 'string', contents);
+
+% --------------------------------------------------------------------
+function CopyPasteMenuInterest_Callback(hObject, eventdata, handles)
+% hObject    handle to CopyPasteMenuInterest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function PasteTextInterest_Callback(hObject, eventdata, handles)
+% hObject    handle to PasteTextPayment (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+contents = clipboard('paste');
+set(handles.editInterest, 'string', contents);
+
+
+% --------------------------------------------------------------------
+function CopyPasteMenuPayment_Callback(hObject, eventdata, handles)
+% hObject    handle to CopyPasteMenuPayment (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function PasteTextPayment_Callback(hObject, eventdata, handles)
+% hObject    handle to PasteTextPayment (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+contents = clipboard('paste');
+set(handles.editMonthlyPayment, 'string', contents);
+
+
+% --------------------------------------------------------------------
+function CopyTextPayment_Callback(hObject, eventdata, handles)
+% hObject    handle to CopyTextPayment (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+monthlyPayment = get(handles.editMonthlyPayment, "string");
+clipboard('copy', monthlyPayment);
+
+% --------------------------------------------------------------------
+function CopyTextInterest_Callback(hObject, eventdata, handles)
+% hObject    handle to CopyTextInterest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+interest = get(handles.editInterest, "string");
+clipboard('copy', interest);
+
+% --------------------------------------------------------------------
+function CopyTextLoan_Callback(hObject, eventdata, handles)
+% hObject    handle to CopyTextLoan (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+loan = get(handles.editLoan, "string");
+clipboard('copy', loan);
