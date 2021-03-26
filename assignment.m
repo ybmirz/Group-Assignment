@@ -156,16 +156,31 @@ function calculateButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Get the user input and store then in global variables
-loan = str2double(get(handles.editLoan, "string"));
+% Get the user input into a buffer/temp var
+tempLoan = str2double(get(handles.editLoan, "string"));
+tempInterest = str2double(get(handles.editInterest, "string"));
+tempMPayment = str2double(get(handles.editMonthlyPayment, "string"));
 
-interest = str2double(get(handles.editInterest, "string"));
+% Declaring variables outside as 0
+loan = 0;
+interest = 0;
+monthlyPayment = 0;
 
-monthlyPayment = str2double(get(handles.editMonthlyPayment, "string"));
+% Check whether inputs are NaN, if so, output Error Dialogue
+if (isnan(tempLoan) || isnan(tempInterest) || isnan(tempMPayment))
+   % Not A Number 
+   errordlg("One of the inputs can't be registered!", "warning");
+   set(handles.dataDisplay, 'Data', []);
+else
+    loan = tempLoan;
+    interest = tempInterest;
+    monthlyPayment = tempMPayment;
+end
 
+% Getting the Monthly Interest
 monthlyInterest = (loan * interest) / 12;
 
-
+if ((loan ~= 0) && (interest ~= 0) && (monthlyPayment~=0)) % Just ensuring it's not from the initialization value
 if loan > 5000
     if interest > 0.015
         if monthlyPayment >= monthlyInterest
@@ -182,6 +197,7 @@ if loan > 5000
 else
     errordlg("Insufficient loan amount, minimum $5000", "warning");
     set(handles.dataDisplay, 'Data', []);
+end
 end
 
     function data = calculateData(loan, monthlyPayment, interest)
